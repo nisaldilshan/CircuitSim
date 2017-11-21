@@ -2,8 +2,8 @@ clear all;
 close all;
 
 % read values from netlisfile
-fname =  'fileRLC_SINE.txt';
-[Name N1 N2 arg3 type freq]=textread(fname,'%s %s %s %s %s %s '); 
+fname =  'fileR_only.txt';
+[Name N1 N2 arg3]=textread(fname,'%s %s %s %s '); 
 
 Inverted_A = function_A(fname);
 
@@ -14,22 +14,11 @@ C_count = 0;
 %Declare V SOURCE table
 V_SOURCE = zeros();
 
-%output Vectors
-out_vect1 = [];
-out_vect2 = [];
-
 for i=1:length(Name),
     numNode=max(str2num(N1{i}),max(str2num(N2{i}),numNode));
     if(Name{i}(1)=='V')
         numVolSource = numVolSource+1;
-        V_SOURCE(numVolSource,1) = str2num(arg3{i});
-        if(strcmp(type{i},'sine'))
-            V_SOURCE(numVolSource,2) = 1;
-        elseif(strcmp(type{i},'square'))
-            V_SOURCE(numVolSource,2) = 2;
-        else
-            V_SOURCE(numVolSource,2) = 0;
-        end
+        V_SOURCE(numVolSource) = str2num(arg3{i});
     elseif(Name{i}(1)=='C')
         C_count = C_count+1;
     elseif(Name{i}(1)=='L')
@@ -37,27 +26,39 @@ for i=1:length(Name),
     end    
 end
 
+
+
 %Declare X matrix
 X=zeros(numNode+numVolSource,1);
 %Declare Z matrix
 Z=zeros(numNode+numVolSource,1);
+
+
 %Declare I table
 I_table = zeros(L_count+C_count,3);
+
 %Declare J table
 J_table = zeros(L_count+C_count,3);
+
 %Declare G table
 G_table = zeros(L_count+C_count,4);
 
+
+
 timestep = 1/10000000;
 total_time = 0;
-sim_end_time = 15/10000;
+sim_end_time = 1/1000;
+
 
 %variable set for switches with T and T_on
 %
+
 %variable set for each voltage source with TYPE, T and T_on
 %
+
 %variable set for each current source with TYPE, T and T_on
 %
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -77,7 +78,8 @@ for i=1:length(Name) %UPDATE G TABLE
         G_table(G_src_count,2) = str2num(N1{i});
         G_table(G_src_count,3) = str2num(N2{i});
         G_table(G_src_count,4) = timestep/str2num(arg3{i});
-    end   
+    end
+    
 end
 
 J_src_count = 0;
@@ -102,23 +104,15 @@ end
 %main Loop
 while(total_time <= sim_end_time)
     
-	total_time = total_time + timestep;  
-    
-    %Voltage Source update
-    for i=1:numVolSource
-        V_SOURCE(i,1) = waveform_gen(V_SOURCE(i,2), 5, 0, total_time, (1/50000));
-    end
-    
-    
-    % call I_Update function %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    I_table = I_Update(I_table,G_table,J_table,X,L_count+C_count);
-    
-    % call J_Update function %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    J_table = J_Update(I_table,G_table,J_table,X,L_count+C_count);
+	total_time = total_time + timestep;
     
     
     
-    %%%%%%%%  CREATE Z MATRIX   %%%%%%%%%%
+    % call I_Update function
+    
+    % call J_Update function
+    
+    %CREATE Z MATRIX
     for i=1:numNode
         sum = 0; 
         for k=1:C_count+L_count
@@ -132,23 +126,10 @@ while(total_time <= sim_end_time)
     end
     
     for i = numNode+1:numNode+numVolSource
-        Z(i) = V_SOURCE(i-numNode,1);
+        Z(i) = V_SOURCE(i-numNode);
     end
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    
     
     X = Inverted_A * Z;
-    
-    out_vect1 = [out_vect1; X(2)];
-    out_vect2 = [out_vect2; X(3)];
 end
-
-plot(out_vect1);
-title('v1');
-xlabel('time(s)');
-ylabel('voltage(V)');
-
-figure;
-plot(out_vect2);
-title('v1');
-xlabel('time(s)');
-ylabel('voltage(V)');
