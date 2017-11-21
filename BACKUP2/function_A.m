@@ -1,5 +1,6 @@
-fname =  'circuit1.txt';
-[Name N1 N2 arg3]=textread(fname,'%s %s %s %s ');
+%fname =  'circuit1.txt';
+function y = function_A(fname)
+[Name N1 N2 arg3 type freq]=textread(fname,'%s %s %s %s %s %s ');
 
 T = 1/10000000;     %sampling time
 
@@ -69,4 +70,7 @@ C = transpose(B);
 
 %%%%%%%%%%%%%%%%%%%%%%%%% A Matrix %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 A = [G B;C D];
+y=inv(A);
+%y=A;
+end
 
