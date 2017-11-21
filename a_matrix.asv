@@ -6,14 +6,12 @@ T = 1/10000000;     %sampling time
 numNode =0;         %Number of nodes, not including ground (node 0).
 numVolSource =0;    %Number of voltage sources
 
-%%%%%%%% Calculate number of Nodes and Voltage sources %%%%%%%%%
 for i=1:length(Name),
     numNode=max(str2num(N1{i}),max(str2num(N2{i}),numNode));
     if Name{i}(1)=='V'
         numVolSource = numVolSource+1;
     end    
 end
-
 %%%%%%%%%%%%%%%%%%%%%%%%% Initiate matrices %%%%%%%%%%%%%%%%%%%%
 G=zeros(numNode,numNode);
 B=zeros(numNode,numVolSource);

@@ -1,4 +1,4 @@
-fname =  'circuit1.txt';
+fname =  'circuit2.txt';
 [Name N1 N2 arg3]=textread(fname,'%s %s %s %s ');
 
 T = 1/10000000;     %sampling time
@@ -32,6 +32,8 @@ for i=1:numNode,
                         G(i,j)= G(i,j) + T/str2num(arg3{k});
                    case 'C',
                         G(i,j)= G(i,j) + str2num(arg3{k})/T;
+                   case 'D',
+                        G(i,j)= G(i,j) + str2num(arg3{k});
                end
             else
                 if (((i==str2num(N1{k}))&&(j==str2num(N2{k}))))
@@ -45,6 +47,9 @@ for i=1:numNode,
                        case 'C',
                             G(i,j)= G(i,j) - str2num(arg3{k})/T;
                             G(j,i)= G(j,i) - str2num(arg3{k})/T;
+                       case 'D',
+                            G(i,j)= G(i,j) - str2num(arg3{k});
+                            G(j,i)= G(j,i) - str2num(arg3{k});
                    end               
                end
             end
